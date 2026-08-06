@@ -19,7 +19,7 @@
 </head>
 <body class="bg-slate-100 min-h-screen text-slate-800">
 
-    <!-- Navbar العامة (تظهر في صفحة الهبوط وتسجيل الدخول) -->
+    <!-- Navbar العامة -->
     <nav id="publicNavbar" class="bg-white border-b sticky top-0 z-50 shadow-sm">
         <div class="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
             <div class="flex items-center gap-2 cursor-pointer" onclick="showPage('Landing')">
@@ -412,9 +412,32 @@
         let attendanceChartInstance = null;
         const todayDate = new Date().toISOString().split('T')[0];
 
+        // --- 🔒 التحكم في حفظ وإعادة استرجاع تسجيل الدخول تلقائياً عند الـ Refresh ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedSession = localStorage.getItem('appSession');
+            if (savedSession) {
+                const session = JSON.parse(savedSession);
+                if (session.role === 'admin') {
+                    showPage('AdminDashboard');
+                    loadSettings();
+                    loadAdminDashboardData();
+                } else if (session.role === 'teacher' && session.teacher) {
+                    currentTeacher = session.teacher;
+                    document.getElementById('teacherDashboardTitle').innerText = currentTeacher.name;
+                    document.getElementById('teacherBadge').innerText = currentTeacher.phone;
+                    showPage('TeacherDashboard');
+                    loadTeacherData();
+                } else {
+                    showPage('Landing');
+                }
+            } else {
+                showPage('Landing');
+            }
+        });
+
         // --- 1. رسالة اشتراك المدرس الجاهزة للأدمن ---
         function openTeacherSubscribeWhatsApp() {
-            const adminPhone = "201094978855"; // رقم إدارة المنصة
+            const adminPhone = "201094978855";
             const teacherSubscriptionText = `السلام عليكم ورحمة الله وبركاته،
 أرغب في الاشتراك في منصة المعلم الذكي لتفعيل حساب مدرس جديد 🚀
 
@@ -492,6 +515,8 @@
             msg.classList.add('hidden');
 
             if (phone === '01094978855' && pass === '14122007') {
+                // حفظ جلسة الأدمن
+                localStorage.setItem('appSession', JSON.stringify({ role: 'admin' }));
                 showPage('AdminDashboard');
                 loadSettings();
                 loadAdminDashboardData();
@@ -510,6 +535,8 @@
                 msg.classList.remove('hidden');
             } else {
                 currentTeacher = teacher;
+                // حفظ جلسة المدرس
+                localStorage.setItem('appSession', JSON.stringify({ role: 'teacher', teacher: teacher }));
                 document.getElementById('teacherDashboardTitle').innerText = teacher.name;
                 document.getElementById('teacherBadge').innerText = teacher.phone;
                 showPage('TeacherDashboard');
@@ -518,6 +545,8 @@
         }
 
         function logout() {
+            // مسح الجلسة فوراً عند تسجيل الخروج يدوياً
+            localStorage.removeItem('appSession');
             currentTeacher = null;
             showPage('Landing');
         }
@@ -834,7 +863,6 @@
 
             renderSessionList();
 
-            // إرسال تنبيه الغياب الجاهز المحدث لولي الأمر تلقائياً متضمناً اسم المدرس والمجموعة
             if (status === 'غائب') {
                 sendParentAbsenceNotification(student);
             }
