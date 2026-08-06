@@ -9,6 +9,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
     <!-- Supabase JS Client -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Chart.js للمؤشرات البيانية -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style> 
         body { font-family: 'Cairo', sans-serif; background-color: #f1f5f9; } 
         .sidebar-item-active { background-color: #4f46e5; color: #ffffff !important; font-weight: 700; }
@@ -17,7 +19,7 @@
 </head>
 <body class="bg-slate-100 min-h-screen text-slate-800">
 
-    <!-- Navbar العامة (تظهر فقط في صفحة الهبوط وتسجيل الدخول) -->
+    <!-- Navbar العامة (تظهر في صفحة الهبوط وتسجيل الدخول) -->
     <nav id="publicNavbar" class="bg-white border-b sticky top-0 z-50 shadow-sm">
         <div class="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
             <div class="flex items-center gap-2 cursor-pointer" onclick="showPage('Landing')">
@@ -25,9 +27,9 @@
                 <span class="font-black text-indigo-600 text-lg">منصة المعلم الذكي</span>
             </div>
             <div class="flex gap-2">
-                <a href="https://wa.me/201094978855?text=%D0%A3%D0%BB%D0%B0%D0%BC%D1%83%20%D0%B9%D0%BB%D0%B9%D0%BA%D0%BC%D0%8C%20%D0%B0%D1%80%D0%B9%D0%AF%20%D0%B0%D0%BB%D0%B0%D1%88%D1%82%D1%80%D0%B0%D0%BA%20%D0%B1%D0%A5%D0%B7%D0%B0%D0%BC%D0%A9%20%D0%A5%D0%B5%D0%A8%D0%A1%D0%A2%D0%B5%D0%B8" target="_blank" class="text-xs bg-emerald-500 hover:bg-emerald-600 text-white font-bold px-3.5 py-2 rounded-xl shadow-md transition flex items-center gap-1">
+                <button onclick="openTeacherSubscribeWhatsApp()" class="text-xs bg-emerald-500 hover:bg-emerald-600 text-white font-bold px-3.5 py-2 rounded-xl shadow-md transition flex items-center gap-1">
                     <span>💬 اشترك الآن</span>
-                </a>
+                </button>
                 <button onclick="showPage('UnifiedLogin')" class="text-xs bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-4 py-2 rounded-xl shadow-md transition">تسجيل الدخول 🔑</button>
             </div>
         </div>
@@ -38,12 +40,12 @@
         <div class="text-center space-y-4 pt-6">
             <span class="bg-indigo-100 text-indigo-700 text-xs font-black px-3 py-1.5 rounded-full">المنصة رقم #1 لإدارة السنتر ومتابعة أولياء الأمور</span>
             <h1 class="text-3xl md:text-5xl font-black text-slate-800 leading-tight">أدر حصصك، حضور طلابك، وتواصل مع أولياء الأمور تلقائياً 🚀</h1>
-            <p class="text-slate-500 text-sm md:text-base max-w-xl mx-auto">نظام سحابي متكامل للمدرسين للتحكم في الحضور والغياب، التحصيل المالي، وتنبيهات الواتساب الفورية الموجهة لولاة الأمور بكود مصر التلقائي.</p>
+            <p class="text-slate-500 text-sm md:text-base max-w-xl mx-auto">نظام سحابي متكامل للمدرسين للتحكم في الحضور والغياب، التحصيل المالي، وتقارير الحضور البيانية التفصيلية لكل طالب من بداية الترم.</p>
             <div class="flex justify-center gap-3 pt-2">
                 <button onclick="showPage('UnifiedLogin')" class="bg-indigo-600 hover:bg-indigo-700 text-white font-black px-8 py-3.5 rounded-2xl text-sm shadow-lg shadow-indigo-200 transition">تسجيل الدخول للنظام ⚡</button>
-                <a href="https://wa.me/201094978855?text=%D0%A3%D0%BB%D0%B0%D0%BC%D1%83%20%D0%B9%D0%BB%D0%B9%D0%BA%D0%BC%D0%8C%20%D0%B0%D1%80%D0%B9%D0%AF%20%D0%B0%D0%BB%D0%B0%D1%88%D1%82%D1%80%D0%B0%D0%BA" target="_blank" class="bg-emerald-500 hover:bg-emerald-600 text-white font-black px-8 py-3.5 rounded-2xl text-sm shadow-lg shadow-emerald-100 transition flex items-center gap-2">
+                <button onclick="openTeacherSubscribeWhatsApp()" class="bg-emerald-500 hover:bg-emerald-600 text-white font-black px-8 py-3.5 rounded-2xl text-sm shadow-lg shadow-emerald-100 transition flex items-center gap-2">
                     <span>💬 اشترك الآن (واتساب)</span>
-                </a>
+                </button>
             </div>
         </div>
 
@@ -51,17 +53,17 @@
             <div class="bg-white p-5 rounded-2xl border shadow-sm space-y-2">
                 <div class="text-2xl">📱</div>
                 <h3 class="font-bold text-sm text-slate-800">حضور بنقرة زر</h3>
-                <p class="text-xs text-slate-500">تسجيل سريع للحضور والغياب للطلاب لكل مجموعة مع ربط مالي مباشر.</p>
+                <p class="text-xs text-slate-500">تسجيل سريع للحضور والغياب للطلاب لكل مجموعة مع تحصيل مالي لحظي.</p>
             </div>
             <div class="bg-white p-5 rounded-2xl border shadow-sm space-y-2">
                 <div class="text-2xl">💬</div>
-                <h3 class="font-bold text-sm text-slate-800">رسائل أولياء الأمور</h3>
-                <p class="text-xs text-slate-500">إرسال رسائل جماعية وفردية لولاة الأمور تحتوي على ميعاد الحصة وحالة الطالب بنقرة واحدة.</p>
+                <h3 class="font-bold text-sm text-slate-800">إشعارات الغياب الفورية</h3>
+                <p class="text-xs text-slate-500">تنبيه ولي الأمر تلقائياً عبر الواتساب متضمناً اسم المدرس والمجموعة.</p>
             </div>
             <div class="bg-white p-5 rounded-2xl border shadow-sm space-y-2">
                 <div class="text-2xl">📊</div>
-                <h3 class="font-bold text-sm text-slate-800">حصيلة مالية لحظية</h3>
-                <p class="text-xs text-slate-500">معرفة إجمالي الدخل اليومي وعدد الطلاب غير الدافعين بوضوح تام.</p>
+                <h3 class="font-bold text-sm text-slate-800">مؤشرات بيانية للطلاب</h3>
+                <p class="text-xs text-slate-500">رسم بياني وسجل كامل لحضور وغياب كل طالب من أول حصة بالترم لنهايته.</p>
             </div>
         </div>
 
@@ -75,9 +77,9 @@
             </div>
             <p class="text-[11px] text-slate-400">شامل الدعم الفني وتحديثات النظام المستمرة.</p>
             <div class="pt-2">
-                <a href="https://wa.me/201094978855?text=%D0%A3%D0%BB%D0%B0%D0%BC%D1%83%20%D0%B9%D0%BB%D0%B9%D0%BA%D0%BC%D0%8C%20%D0%B0%D1%80%D0%B9%D0%AF%20%D0%B0%D0%BB%D0%B0%D1%88%D1%82%D1%80%D0%B0%D0%BA" target="_blank" class="inline-block bg-emerald-500 hover:bg-emerald-600 text-white font-bold px-6 py-2.5 rounded-xl text-xs transition">
+                <button onclick="openTeacherSubscribeWhatsApp()" class="inline-block bg-emerald-500 hover:bg-emerald-600 text-white font-bold px-6 py-2.5 rounded-xl text-xs transition">
                     تواصل معنا للاشتراك الفوري عبر الواتساب 📲
-                </a>
+                </button>
             </div>
         </div>
     </section>
@@ -103,7 +105,6 @@
 
     <!-- 3. ADMIN DASHBOARD -->
     <section id="pageAdminDashboard" class="hidden min-h-screen flex flex-col md:flex-row">
-        
         <!-- SIDEBAR -->
         <aside class="w-full md:w-64 bg-slate-900 text-white flex-shrink-0 flex flex-col justify-between border-l border-slate-800">
             <div>
@@ -203,7 +204,6 @@
                 <div class="bg-white rounded-2xl border shadow-sm overflow-hidden">
                     <div class="p-4 border-b bg-slate-50 flex flex-col md:flex-row justify-between items-center gap-3">
                         <h3 class="font-bold text-xs text-slate-800">📋 قائمة المدرسين المسجلين</h3>
-                        <!-- إضافة شريط بحث المدرسين -->
                         <input type="text" id="searchTeacherInput" oninput="filterAdminTeachers()" placeholder="🔍 بحث عن مدرس بالاسم أو الهاتف..." class="w-full md:w-64 border rounded-xl p-2 text-xs font-bold bg-white outline-none">
                     </div>
                     <div id="adminTeachersList" class="p-4 space-y-2"></div>
@@ -248,66 +248,126 @@
     </section>
 
     <!-- 4. TEACHER DASHBOARD -->
-    <section id="pageTeacherDashboard" class="hidden">
-        <header class="bg-indigo-600 text-white p-4 shadow-md sticky top-0 z-50 flex justify-between items-center">
+    <section id="pageTeacherDashboard" class="hidden min-h-screen flex flex-col md:flex-row">
+        <!-- TEACHER SIDEBAR -->
+        <aside class="w-full md:w-64 bg-slate-900 text-white flex-shrink-0 flex flex-col justify-between border-l border-slate-800">
             <div>
-                <h1 id="teacherDashboardTitle" class="font-black text-sm md:text-base">⚡ منصة المعلم الذكي</h1>
-                <p id="teacherBadge" class="text-[10px] text-indigo-200">مدرس معتمد</p>
-            </div>
-            <div class="flex items-center gap-2">
-                <div class="text-left bg-indigo-700 px-3 py-1 rounded-xl">
-                    <span class="text-[9px] text-indigo-200 block">حصيلة اليوم</span>
-                    <span id="todayTotal" class="font-black text-emerald-300 text-xs">0 ج.م</span>
+                <div class="p-5 border-b border-slate-800 flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <span class="text-xl">⚡</span>
+                        <div>
+                            <h2 id="teacherDashboardTitle" class="font-black text-sm text-indigo-400">لوحة المعلم</h2>
+                            <p id="teacherBadge" class="text-[10px] text-slate-400">مدرس معتمد</p>
+                        </div>
+                    </div>
                 </div>
-                <button onclick="logout()" class="bg-red-500 hover:bg-red-600 text-white text-[10px] px-2.5 py-2 rounded-xl font-bold transition">خروج 🚪</button>
+
+                <div class="p-4 bg-slate-800/50 m-3 rounded-2xl border border-slate-700/50 flex justify-between items-center">
+                    <div>
+                        <span class="text-[10px] text-slate-400 block font-bold">تحصيل اليوم</span>
+                        <span id="todayTotal" class="font-black text-emerald-400 text-sm">0 ج.م</span>
+                    </div>
+                    <span class="text-xl">💵</span>
+                </div>
+
+                <nav class="p-3 space-y-1 text-xs font-semibold text-slate-300">
+                    <button onclick="switchTeacherTab('session')" id="teacherTabNav-session" class="w-full flex items-center gap-3 px-3.5 py-3 rounded-xl hover:bg-slate-800 transition sidebar-item-active">
+                        <span class="text-base">📖</span>
+                        <span>الحصة الحالية</span>
+                    </button>
+                    <button onclick="switchTeacherTab('analytics')" id="teacherTabNav-analytics" class="w-full flex items-center gap-3 px-3.5 py-3 rounded-xl hover:bg-slate-800 transition">
+                        <span class="text-base">📊</span>
+                        <span>سجل الحضور والمؤشر البياني</span>
+                    </button>
+                    <button onclick="switchTeacherTab('students')" id="teacherTabNav-students" class="w-full flex items-center gap-3 px-3.5 py-3 rounded-xl hover:bg-slate-800 transition">
+                        <span class="text-base">👥</span>
+                        <span>إدارة المجموعات والطلاب</span>
+                    </button>
+                </nav>
             </div>
-        </header>
 
-        <div class="flex border-b bg-white text-xs font-bold text-center">
-            <button onclick="switchTeacherTab('session')" id="tabSession" class="flex-1 py-3 text-indigo-600 border-b-2 border-indigo-600">📖 الحصة الحالية</button>
-            <button onclick="switchTeacherTab('broadcast')" id="tabBroadcast" class="flex-1 py-3 text-slate-500">📢 إرسال جماعي لولاة الأمور</button>
-            <button onclick="switchTeacherTab('students')" id="tabStudents" class="flex-1 py-3 text-slate-500">👥 إدارة الطلاب</button>
-        </div>
+            <div class="p-4 border-t border-slate-800">
+                <button onclick="logout()" class="w-full bg-red-500/10 hover:bg-red-500 text-red-400 hover:text-white font-bold py-2.5 rounded-xl text-xs transition flex items-center justify-center gap-2">
+                    <span>🚪 تسجيل الخروج</span>
+                </button>
+            </div>
+        </aside>
 
-        <main class="p-4 max-w-lg mx-auto space-y-4">
+        <!-- MAIN CONTENT AREA FOR TEACHER -->
+        <main class="flex-1 p-4 md:p-8 overflow-y-auto space-y-6">
             <!-- TAB 1: الحصة الحالية -->
-            <section id="secSession" class="space-y-4">
-                <div class="bg-white p-3 rounded-2xl border space-y-2 shadow-sm">
-                    <label class="block text-xs font-bold text-slate-600">اختر المجموعة:</label>
-                    <select id="sessionGroupSelect" onchange="renderSessionList()" class="w-full bg-slate-50 border rounded-xl p-2.5 text-xs font-bold text-slate-800 outline-none"></select>
+            <section id="secSession" class="space-y-4 max-w-3xl">
+                <div class="bg-white p-4 rounded-2xl border shadow-sm flex flex-col md:flex-row justify-between items-center gap-3">
+                    <label class="text-xs font-bold text-slate-700 whitespace-nowrap">اختر المجموعة للحصة الحالية:</label>
+                    <select id="sessionGroupSelect" onchange="renderSessionList()" class="w-full md:w-64 bg-slate-50 border rounded-xl p-2.5 text-xs font-bold text-slate-800 outline-none focus:ring-2 focus:ring-indigo-500"></select>
                 </div>
+
+                <div class="bg-amber-50 border border-amber-200 p-3 rounded-xl text-center">
+                    <p class="text-[11px] text-amber-800 font-bold">🔔 عند اختيار (غائب 🔴) يتم إرسال تنبيه فوري لولي الأمر يتضمن اسم المدرس والمجموعة تلقائياً.</p>
+                </div>
+
                 <div id="sessionStudentsList" class="space-y-3"></div>
             </section>
 
-            <!-- TAB 2: الإرسال الجماعي -->
-            <section id="secBroadcast" class="space-y-4 hidden">
-                <div class="bg-white p-4 rounded-2xl border space-y-3 shadow-sm">
-                    <h3 class="font-black text-xs text-slate-800">📢 إرسال رسائل جماعية لولاة الأمور</h3>
-                    <p class="text-[11px] text-slate-500">اختر صيغة الرسالة التلقائية أو قم بتخصيصها.</p>
+            <!-- TAB 2: سجل الحضور والمؤشر البياني المخصص -->
+            <section id="secAnalytics" class="space-y-6 hidden max-w-4xl">
+                <div class="bg-white p-5 rounded-2xl border shadow-sm space-y-4">
+                    <h3 class="font-bold text-sm text-slate-800 flex items-center gap-2">
+                        <span>🔍 اختر الطالب لعرض سجل ترم الحضور والمؤشر البياني</span>
+                    </h3>
+                    <select id="studentAnalyticsSelect" onchange="renderStudentAnalytics()" class="w-full border rounded-xl p-3 text-xs font-bold bg-slate-50 outline-none focus:ring-2 focus:ring-indigo-500">
+                        <option value="">اختر طالباً لمشاهدة التفاصيل...</option>
+                    </select>
+                </div>
 
-                    <div>
-                        <label class="block text-xs font-bold text-slate-600 mb-1">اختر قالب جاهز:</label>
-                        <select id="templateSelect" onchange="applyTemplate()" class="w-full border rounded-xl p-2 text-xs font-bold bg-slate-50">
-                            <option value="absent">قالب 1: إشعارات الغياب اليومي</option>
-                            <option value="attendance">قالب 2: تأكيد الحضور والالتزام</option>
-                            <option value="payment">قالب 3: تذكير بمصروفات الحصة</option>
-                        </select>
+                <div id="analyticsDisplayContainer" class="hidden space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="bg-white p-5 rounded-2xl border shadow-sm flex flex-col items-center justify-center text-center">
+                            <span class="text-xs font-bold text-slate-400">إجمالي الحصص بالترم</span>
+                            <span id="statStudentTotalSessions" class="text-3xl font-black text-slate-800 mt-1">0</span>
+                        </div>
+                        <div class="bg-white p-5 rounded-2xl border shadow-sm flex flex-col items-center justify-center text-center">
+                            <span class="text-xs font-bold text-slate-400">مرات الحضور</span>
+                            <span id="statStudentPresentCount" class="text-3xl font-black text-emerald-600 mt-1">0</span>
+                        </div>
+                        <div class="bg-white p-5 rounded-2xl border shadow-sm flex flex-col items-center justify-center text-center">
+                            <span class="text-xs font-bold text-slate-400">مرات الغياب</span>
+                            <span id="statStudentAbsentCount" class="text-3xl font-black text-red-500 mt-1">0</span>
+                        </div>
                     </div>
 
-                    <div>
-                        <label class="block text-xs font-bold text-slate-600 mb-1">نص الرسالة:</label>
-                        <textarea id="broadcastText" rows="4" class="w-full border rounded-xl p-2.5 text-xs font-bold bg-slate-50 outline-none leading-relaxed"></textarea>
-                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Chart Container -->
+                        <div class="bg-white p-5 rounded-2xl border shadow-sm flex flex-col items-center">
+                            <h4 class="font-bold text-xs text-slate-700 mb-4">📈 نسبة التزام الطالب خلال الترم</h4>
+                            <div class="w-48 h-48">
+                                <canvas id="studentAttendanceChart"></canvas>
+                            </div>
+                        </div>
 
-                    <button onclick="sendBulkMessages()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl text-xs shadow-md transition flex items-center justify-center gap-2">
-                        <span>💬 إرسال الدفعة الحالية على واتساب</span>
-                    </button>
+                        <!-- Timeline Container -->
+                        <div class="bg-white p-5 rounded-2xl border shadow-sm space-y-3">
+                            <h4 class="font-bold text-xs text-slate-700">📜 السجل التفصيلي للحصص</h4>
+                            <div id="studentSessionsTimeline" class="space-y-2 max-h-64 overflow-y-auto pr-1"></div>
+                        </div>
+                    </div>
                 </div>
             </section>
 
-            <!-- TAB 3: إدارة الطلاب -->
-            <section id="secStudents" class="space-y-4 hidden">
-                <form onsubmit="addStudent(event)" class="bg-white p-4 rounded-2xl border space-y-3 shadow-sm">
+            <!-- TAB 3: المجموعات وإدارة الطلاب -->
+            <section id="secStudents" class="space-y-6 hidden max-w-3xl">
+                <!-- قسم 1: إنشاء المجموعات -->
+                <div class="bg-white p-5 rounded-2xl border space-y-3 shadow-sm">
+                    <h3 class="font-black text-xs text-slate-800">📚 إدارة المجموعات الحالية</h3>
+                    <div class="flex gap-2">
+                        <input type="text" id="newGroupNameInput" placeholder="اسم المجموعة الجديد (مثلاً: أبتدائي 1)" class="w-full border rounded-xl p-2.5 text-xs font-bold bg-slate-50 outline-none">
+                        <button onclick="addGroup()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-4 rounded-xl text-xs flex-shrink-0 transition">إضافة ➕</button>
+                    </div>
+                    <div id="groupsChipContainer" class="flex flex-wrap gap-1.5 pt-1"></div>
+                </div>
+
+                <!-- قسم 2: إضافة طالب جديد -->
+                <form onsubmit="addStudent(event)" class="bg-white p-5 rounded-2xl border space-y-3 shadow-sm">
                     <h3 class="font-black text-xs text-slate-800">➕ إضافة طالب جديد</h3>
                     <input type="text" id="stdName" placeholder="اسم الطالب" required class="w-full border rounded-xl p-2.5 text-xs font-bold bg-slate-50 outline-none">
                     <div>
@@ -319,14 +379,16 @@
                     </div>
                     <div class="grid grid-cols-2 gap-2">
                         <input type="number" id="stdFee" placeholder="المبلغ (ج.م)" value="60" required class="w-full border rounded-xl p-2.5 text-xs font-bold bg-slate-50 outline-none">
-                        <input type="text" id="stdGroup" placeholder="المجموعة" required class="w-full border rounded-xl p-2.5 text-xs font-bold bg-slate-50 outline-none">
+                        <select id="stdGroupSelect" required class="w-full border rounded-xl p-2.5 text-xs font-bold bg-slate-50 outline-none">
+                            <option value="">اختر المجموعة...</option>
+                        </select>
                     </div>
                     <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-xl text-xs transition">حفظ الطالب تلقائياً ☁️</button>
                 </form>
 
-                <!-- شريط بحث الطلاب لوحة المدرس -->
+                <!-- شريط بحث الطلاب -->
                 <div class="bg-white p-3 rounded-2xl border shadow-sm">
-                    <input type="text" id="teacherSearchStudent" oninput="renderAllStudentsList()" placeholder="🔍 بحث باسم الطالب أو الهاتف..." class="w-full border rounded-xl p-2 text-xs font-bold bg-slate-50 outline-none">
+                    <input type="text" id="teacherSearchStudent" oninput="renderAllStudentsList()" placeholder="🔍 بحث باسم الطالب أو الهاتف..." class="w-full border rounded-xl p-2.5 text-xs font-bold bg-slate-50 outline-none">
                 </div>
 
                 <div id="allStudentsList" class="space-y-2"></div>
@@ -342,10 +404,49 @@
 
         let currentTeacher = null;
         let students = [];
+        let teacherGroups = [];
         let allAdminTeachers = [];
         let allAdminStudents = [];
         let todayData = {};
+        let allAttendanceRecords = [];
+        let attendanceChartInstance = null;
         const todayDate = new Date().toISOString().split('T')[0];
+
+        // --- 1. رسالة اشتراك المدرس الجاهزة للأدمن ---
+        function openTeacherSubscribeWhatsApp() {
+            const adminPhone = "201094978855"; // رقم إدارة المنصة
+            const teacherSubscriptionText = `السلام عليكم ورحمة الله وبركاته،
+أرغب في الاشتراك في منصة المعلم الذكي لتفعيل حساب مدرس جديد 🚀
+
+📌 التفاصيل المطلوب معرفتها:
+- تفعيل الاشتراك مدى الحياة
+- كيفية رفع وإدارة المجموعات والطلاب
+
+أرجو التواصل معي لتزويدي بتفاصيل الدفع وتفعيل الحساب.`;
+
+            const url = `https://wa.me/${adminPhone}?text=${encodeURIComponent(teacherSubscriptionText)}`;
+            window.open(url, '_blank');
+        }
+
+        // --- 2. رسالة غياب ولي الأمر الجاهزة التي تتضمن اسم المدرس والمجموعة ---
+        function sendParentAbsenceNotification(student) {
+            if (!currentTeacher) return;
+            
+            const parentPhone = formatEgyptianPhone(student.phone);
+            const parentMessage = `ولي الأمر المحترم، تحية طيبة وبعد 🌸
+
+نود إحاطتكم علماً بأن الطالب/ة: (${student.name}) غائب اليوم عن الحصة.
+
+📌 تفاصيل الحصة:
+- 👨‍🏫 المعلم: ${currentTeacher.name}
+- 📚 المجموعة: ${student.group}
+- 📅 التاريخ: ${todayDate}
+
+نرجو المتابعة لضمان عدم تأخر المستوى الدراسي. لأي استفسار يمكنكم الرد على هذه الرسالة.`;
+
+            const whatsappUrl = `https://wa.me/${parentPhone}?text=${encodeURIComponent(parentMessage)}`;
+            window.open(whatsappUrl, '_blank');
+        }
 
         function formatEgyptianPhone(phoneRaw) {
             let cleaned = (phoneRaw || '').toString().replace(/\D/g, '');
@@ -409,10 +510,10 @@
                 msg.classList.remove('hidden');
             } else {
                 currentTeacher = teacher;
-                document.getElementById('teacherBadge').innerText = teacher.name + ' (' + teacher.phone + ')';
+                document.getElementById('teacherDashboardTitle').innerText = teacher.name;
+                document.getElementById('teacherBadge').innerText = teacher.phone;
                 showPage('TeacherDashboard');
                 loadTeacherData();
-                applyTemplate();
             }
         }
 
@@ -421,7 +522,7 @@
             showPage('Landing');
         }
 
-        // --- Admin Navigation ---
+        // --- Admin Functions ---
         function switchAdminTab(tabKey) {
             const tabs = ['stats', 'teachers', 'students', 'revenues', 'settings'];
             const titles = {
@@ -442,7 +543,6 @@
             document.getElementById('adminCurrentTabTitle').innerText = titles[tabKey];
         }
 
-        // --- Fetch Admin Data ---
         async function loadAdminDashboardData() {
             const { data: teachers } = await _supabase.from('teachers').select('*');
             allAdminTeachers = teachers || [];
@@ -510,7 +610,7 @@
         }
 
         async function adminDeleteTeacher(id) {
-            if (confirm('هل أنت تأكد من حذف هذا المدرس وجميع بياناته؟')) {
+            if (confirm('هل أنت متأكد من حذف هذا المدرس وجميع بياناته؟')) {
                 await _supabase.from('teachers').delete().eq('id', id);
                 loadAdminDashboardData();
             }
@@ -550,7 +650,6 @@
             }
         }
 
-        // --- إصلاح وتكملة تقرير الإيرادات الكامل للأدمن ---
         function renderAdminRevenues(paidAttendance) {
             const container = document.getElementById('adminTeacherRevenuesList');
             container.innerHTML = allAdminTeachers.map(t => {
@@ -587,15 +686,15 @@
             loadSettings();
         }
 
-        // --- TEACHER LOGIC ---
+        // --- Teacher Functions ---
         function switchTeacherTab(tabKey) {
-            ['session', 'broadcast', 'students'].forEach(t => {
+            ['session', 'analytics', 'students'].forEach(t => {
                 document.getElementById('sec' + t.charAt(0).toUpperCase() + t.slice(1)).classList.add('hidden');
-                document.getElementById('tab' + t.charAt(0).toUpperCase() + t.slice(1)).className = "flex-1 py-3 text-slate-500";
+                document.getElementById('teacherTabNav-' + t).classList.remove('sidebar-item-active');
             });
 
             document.getElementById('sec' + tabKey.charAt(0).toUpperCase() + tabKey.slice(1)).classList.remove('hidden');
-            document.getElementById('tab' + tabKey.charAt(0).toUpperCase() + tabKey.slice(1)).className = "flex-1 py-3 text-indigo-600 border-b-2 border-indigo-600";
+            document.getElementById('teacherTabNav-' + tabKey).classList.add('sidebar-item-active');
         }
 
         async function loadTeacherData() {
@@ -604,25 +703,63 @@
             const { data: stds } = await _supabase.from('students').select('*').eq('teacher_id', currentTeacher.id);
             students = stds || [];
 
-            const { data: att } = await _supabase.from('attendance').select('*').eq('date', todayDate);
+            const existingGroups = [...new Set(students.map(s => s.group))].filter(Boolean);
+            teacherGroups = existingGroups.length > 0 ? existingGroups : ["مجموعة 1"];
+
+            const studentIds = students.map(s => s.id);
+            if (studentIds.length > 0) {
+                const { data: att } = await _supabase.from('attendance').select('*').in('student_id', studentIds);
+                allAttendanceRecords = att || [];
+            } else {
+                allAttendanceRecords = [];
+            }
+
             todayData = {};
-            (att || []).forEach(a => {
+            allAttendanceRecords.filter(a => a.date === todayDate).forEach(a => {
                 todayData[a.student_id] = { status: a.status, paid: a.paid };
             });
 
-            updateGroupsDropdown();
+            renderGroupsUI();
             renderSessionList();
             renderAllStudentsList();
+            populateAnalyticsStudentDropdown();
             calculateTodayTotal();
         }
 
-        function updateGroupsDropdown() {
-            const groups = [...new Set(students.map(s => s.group))];
-            const select = document.getElementById('sessionGroupSelect');
-            if (groups.length === 0) {
-                select.innerHTML = '<option value="">لا توجد مجموعات حتى الآن</option>';
+        function renderGroupsUI() {
+            const sessionSelect = document.getElementById('sessionGroupSelect');
+            sessionSelect.innerHTML = teacherGroups.map(g => `<option value="${g}">مجموعة: ${g}</option>`).join('');
+
+            const stdGroupSelect = document.getElementById('stdGroupSelect');
+            stdGroupSelect.innerHTML = '<option value="">اختر المجموعة...</option>' + teacherGroups.map(g => `<option value="${g}">${g}</option>`).join('');
+
+            const container = document.getElementById('groupsChipContainer');
+            container.innerHTML = teacherGroups.map(g => `
+                <span class="bg-indigo-50 border border-indigo-100 text-indigo-700 font-bold text-[11px] px-2.5 py-1 rounded-xl flex items-center gap-1">
+                    <span>${g}</span>
+                    <button onclick="removeGroup('${g}')" class="text-red-500 hover:text-red-700 mr-1 font-black">×</button>
+                </span>
+            `).join('');
+        }
+
+        function addGroup() {
+            const input = document.getElementById('newGroupNameInput');
+            const newGroup = input.value.trim();
+            if (!newGroup) return;
+
+            if (!teacherGroups.includes(newGroup)) {
+                teacherGroups.push(newGroup);
+                renderGroupsUI();
+                input.value = '';
             } else {
-                select.innerHTML = groups.map(g => `<option value="${g}">مجموعة: ${g}</option>`).join('');
+                alert('هذه المجموعة موجودة بالفعل!');
+            }
+        }
+
+        function removeGroup(groupName) {
+            if (confirm(`هل أنت متأكد من حذف مجموعة "${groupName}"؟`)) {
+                teacherGroups = teacherGroups.filter(g => g !== groupName);
+                renderGroupsUI();
             }
         }
 
@@ -655,15 +792,18 @@
                                 <h4 class="font-bold text-xs text-slate-800">${s.name}</h4>
                                 <span class="text-[10px] text-slate-400">المبلغ: ${s.fee} ج.م</span>
                             </div>
-                            <!-- إضافة زر الواتساب المباشر للطالب -->
                             <a href="https://wa.me/${formatEgyptianPhone(s.phone)}?text=${encodeURIComponent('أهلاً بحضرتك، بخصوص الطالب/ة ' + s.name)}" target="_blank" class="bg-emerald-100 hover:bg-emerald-200 text-emerald-700 px-2.5 py-1 rounded-xl text-[10px] font-bold flex items-center gap-1">
-                                <span>💬 واتساب</span>
+                                <span>💬 محادثة مباشرة</span>
                             </a>
                         </div>
                         <div class="grid grid-cols-3 gap-1.5 pt-1">
-                            <button onclick="markAttendance(${s.id}, 'حاضر')" class="py-1.5 rounded-xl text-xs font-bold transition ${rec.status === 'حاضر' ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-600'}">حاضر 🟢</button>
-                            <button onclick="markAttendance(${s.id}, 'غائب')" class="py-1.5 rounded-xl text-xs font-bold transition ${rec.status === 'غائب' ? 'bg-red-600 text-white' : 'bg-slate-100 text-slate-600'}">غائب 🔴</button>
-                            <button onclick="togglePayment(${s.id})" class="py-1.5 rounded-xl text-xs font-bold transition ${rec.paid ? 'bg-emerald-500 text-white' : 'bg-slate-100 text-slate-600'}">${rec.paid ? 'تم الدفع 💵' : 'لم يدفع ❌'}</button>
+                            <button onclick="markAttendance(${s.id}, 'حاضر')" class="py-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1 ${rec.status === 'حاضر' ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-600'}">
+                                <span>حاضر 🟢</span>
+                            </button>
+                            <button onclick="markAttendance(${s.id}, 'غائب')" class="py-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1 ${rec.status === 'غائب' ? 'bg-red-600 text-white' : 'bg-slate-100 text-slate-600'}">
+                                <span>غائب 🔴</span>
+                            </button>
+                            <button onclick="togglePayment(${s.id})" class="py-2 rounded-xl text-xs font-bold transition ${rec.paid ? 'bg-emerald-500 text-white' : 'bg-slate-100 text-slate-600'}">${rec.paid ? 'تم الدفع 💵' : 'لم يدفع ❌'}</button>
                         </div>
                     </div>
                 `;
@@ -671,60 +811,127 @@
         }
 
         async function markAttendance(studentId, status) {
+            const student = students.find(s => s.id === studentId);
+            if (!student) return;
+
             if (!todayData[studentId]) todayData[studentId] = { status: null, paid: false };
             todayData[studentId].status = status;
 
-            await _supabase.from('attendance').upsert({
+            const record = {
                 student_id: studentId,
                 date: todayDate,
                 status: status,
                 paid: todayData[studentId].paid
-            }, { onConflict: 'student_id,date' });
+            };
+            await _supabase.from('attendance').upsert(record, { onConflict: 'student_id,date' });
+
+            const existingIndex = allAttendanceRecords.findIndex(a => a.student_id === studentId && a.date === todayDate);
+            if (existingIndex > -1) {
+                allAttendanceRecords[existingIndex] = record;
+            } else {
+                allAttendanceRecords.push(record);
+            }
 
             renderSessionList();
+
+            // إرسال تنبيه الغياب الجاهز المحدث لولي الأمر تلقائياً متضمناً اسم المدرس والمجموعة
+            if (status === 'غائب') {
+                sendParentAbsenceNotification(student);
+            }
         }
 
         async function togglePayment(studentId) {
             if (!todayData[studentId]) todayData[studentId] = { status: null, paid: false };
             todayData[studentId].paid = !todayData[studentId].paid;
 
-            await _supabase.from('attendance').upsert({
+            const record = {
                 student_id: studentId,
                 date: todayDate,
                 status: todayData[studentId].status || 'حاضر',
                 paid: todayData[studentId].paid
-            }, { onConflict: 'student_id,date' });
+            };
+
+            await _supabase.from('attendance').upsert(record, { onConflict: 'student_id,date' });
+
+            const existingIndex = allAttendanceRecords.findIndex(a => a.student_id === studentId && a.date === todayDate);
+            if (existingIndex > -1) {
+                allAttendanceRecords[existingIndex] = record;
+            } else {
+                allAttendanceRecords.push(record);
+            }
 
             calculateTodayTotal();
             renderSessionList();
         }
 
-        function applyTemplate() {
-            const template = document.getElementById('templateSelect').value;
-            const textarea = document.getElementById('broadcastText');
-            if (template === 'absent') {
-                textarea.value = "ولي الأمر المحترم، نود إحاطتكم علماً بأن الطالب/ة غائب اليوم عن ميعاد الحصة. نرجو المتابعة لضمان عدم تأخر المستوى الدراسي.";
-            } else if (template === 'attendance') {
-                textarea.value = "ولي الأمر المحترم، تم بحمد الله حضور الطالب/ة لحصة اليوم والالتزام بجميع التعليمات والواجبات المطلوب أداؤها.";
-            } else if (template === 'payment') {
-                textarea.value = "ولي الأمر المحترم، نذكركم بلطف بمصروفات الحصة المقررة اليوم. شاكرين لحسن تعاونكم ودعمكم المستمر.";
-            }
+        // --- Analytics Chart Functions ---
+        function populateAnalyticsStudentDropdown() {
+            const select = document.getElementById('studentAnalyticsSelect');
+            select.innerHTML = '<option value="">اختر طالباً لمشاهدة التفاصيل...</option>' + 
+                students.map(s => `<option value="${s.id}">${s.name} (مجموعة: ${s.group})</option>`).join('');
         }
 
-        function sendBulkMessages() {
-            const selectedGroup = document.getElementById('sessionGroupSelect').value;
-            const text = document.getElementById('broadcastText').value;
-            const filtered = students.filter(s => s.group === selectedGroup);
+        function renderStudentAnalytics() {
+            const studentId = parseInt(document.getElementById('studentAnalyticsSelect').value);
+            const container = document.getElementById('analyticsDisplayContainer');
 
-            if (filtered.length === 0) {
-                alert('لا يوجد طلاب في هذه المجموعة!');
+            if (!studentId) {
+                container.classList.add('hidden');
                 return;
             }
 
-            filtered.forEach(s => {
-                const url = `https://wa.me/${formatEgyptianPhone(s.phone)}?text=${encodeURIComponent(text)}`;
-                window.open(url, '_blank');
+            container.classList.remove('hidden');
+
+            const records = allAttendanceRecords.filter(a => a.student_id === studentId).sort((a,b) => new Date(b.date) - new Date(a.date));
+
+            const totalSessions = records.length;
+            const presentCount = records.filter(r => r.status === 'حاضر').length;
+            const absentCount = records.filter(r => r.status === 'غائب').length;
+
+            document.getElementById('statStudentTotalSessions').innerText = totalSessions;
+            document.getElementById('statStudentPresentCount').innerText = presentCount;
+            document.getElementById('statStudentAbsentCount').innerText = absentCount;
+
+            const ctx = document.getElementById('studentAttendanceChart').getContext('2d');
+            if (attendanceChartInstance) {
+                attendanceChartInstance.destroy();
+            }
+
+            attendanceChartInstance = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['حضور 🟢', 'غياب 🔴'],
+                    datasets: [{
+                        data: [presentCount, absentCount],
+                        backgroundColor: ['#10b981', '#ef4444'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: { position: 'bottom' }
+                    }
+                }
             });
+
+            const timelineContainer = document.getElementById('studentSessionsTimeline');
+            if (records.length === 0) {
+                timelineContainer.innerHTML = '<p class="text-xs text-slate-400">لا يوجد سجل حصص سابق لهذا الطالب حتى الآن.</p>';
+            } else {
+                timelineContainer.innerHTML = records.map(r => `
+                    <div class="bg-slate-50 border p-2.5 rounded-xl flex justify-between items-center text-xs">
+                        <div>
+                            <span class="font-bold text-slate-800">${r.date}</span>
+                            <span class="text-[10px] text-slate-400 block">${r.paid ? 'تم الدفع 💵' : 'لم يدفع ❌'}</span>
+                        </div>
+                        <span class="font-bold px-2.5 py-1 rounded-lg text-[10px] ${r.status === 'حاضر' ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'}">
+                            ${r.status}
+                        </span>
+                    </div>
+                `).join('');
+            }
         }
 
         async function addStudent(e) {
@@ -732,7 +939,12 @@
             const name = document.getElementById('stdName').value.trim();
             const phone = document.getElementById('stdPhone').value.trim();
             const fee = parseFloat(document.getElementById('stdFee').value);
-            const group = document.getElementById('stdGroup').value.trim();
+            const group = document.getElementById('stdGroupSelect').value;
+
+            if (!group) {
+                alert('يرجى اختيار المجموعة أولاً!');
+                return;
+            }
 
             const formattedPhone = formatEgyptianPhone(phone);
 
